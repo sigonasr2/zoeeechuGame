@@ -1,0 +1,156 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="GameLoop.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="App\app.cpp">
+      <Filter>NextAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="App\main.cpp">
+      <Filter>NextAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="App\SimpleController.cpp">
+      <Filter>NextAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="App\SimpleSound.cpp">
+      <Filter>NextAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="App\SimpleSprite.cpp">
+      <Filter>NextAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="stb_image\stb_image.cpp">
+      <Filter>stb_image</Filter>
+    </ClCompile>
+    <ClCompile Include="body.cpp">
+      <Filter>zoe\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="button.cpp">
+      <Filter>zoe\simpleButton</Filter>
+    </ClCompile>
+    <ClCompile Include="manager.cpp">
+      <Filter>zoe\sceneMNGR</Filter>
+    </ClCompile>
+    <ClCompile Include="menuScene.cpp">
+      <Filter>Scenes\menu</Filter>
+    </ClCompile>
+    <ClCompile Include="simpleShape.cpp">
+      <Filter>zoe\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="simpleCollision.cpp">
+      <Filter>zoe\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="gameScene.cpp">
+      <Filter>Scenes\game</Filter>
+    </ClCompile>
+    <ClCompile Include="collisionScene.cpp">
+      <Filter>Scenes\collisionScene</Filter>
+    </ClCompile>
+    <ClCompile Include="SimpleCamera2D.cpp">
+      <Filter>zoe\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="planetScene.cpp">
+      <Filter>Scenes\planet_test</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="App\app.h">
+      <Filter>NextAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="App\AppSettings.h">
+      <Filter>NextAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="App\main.h">
+      <Filter>NextAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="App\SimpleController.h">
+      <Filter>NextAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="App\SimpleSound.h">
+      <Filter>NextAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="App\SimpleSprite.h">
+      <Filter>NextAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>NextAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image\stb_image.h">
+      <Filter>stb_image</Filter>
+    </ClInclude>
+    <ClInclude Include="Vec2.h">
+      <Filter>zoe\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Body.h">
+      <Filter>zoe\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="button.h">
+      <Filter>zoe\simpleButton</Filter>
+    </ClInclude>
+    <ClInclude Include="manager.h">
+      <Filter>zoe\sceneMNGR</Filter>
+    </ClInclude>
+    <ClInclude Include="menuScene.h">
+      <Filter>Scenes\menu</Filter>
+    </ClInclude>
+    <ClInclude Include="gameScene.h">
+      <Filter>Scenes\game</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>zoe\sceneMNGR</Filter>
+    </ClInclude>
+    <ClInclude Include="planetScene.h">
+      <Filter>Scenes\planet_test</Filter>
+    </ClInclude>
+    <ClInclude Include="Vec3.h">
+      <Filter>zoe\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleShape.h">
+      <Filter>zoe\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleCollision.h">
+      <Filter>zoe\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="collisionScene.h">
+      <Filter>Scenes\collisionScene</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleCamera2D.h">
+      <Filter>zoe\Math</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="NextAPI">
+      <UniqueIdentifier>{f318918d-bb9f-4402-ae1c-4f72186d16f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="stb_image">
+      <UniqueIdentifier>{61cfc19b-c57e-4021-b530-bac172fcba86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="zoe">
+      <UniqueIdentifier>{be9ed821-c2e9-4aa3-88ee-4a88c57e1afc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="zoe\Math">
+      <UniqueIdentifier>{d5da572a-b323-448f-b9b4-91ec7ca20b92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="zoe\simpleButton">
+      <UniqueIdentifier>{13cd6a29-9b49-44b5-8c19-c1cae9b1c928}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="zoe\sceneMNGR">
+      <UniqueIdentifier>{2a64dfd4-f7f7-46c2-9bf8-beeda0410342}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scenes">
+      <UniqueIdentifier>{16cf4676-29df-46b7-965e-4a7743342801}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scenes\menu">
+      <UniqueIdentifier>{94888cd6-e938-4a3a-a429-65382b90b4a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scenes\game">
+      <UniqueIdentifier>{8721de87-b04b-45db-8226-e2c7c502e615}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scenes\planet_test">
+      <UniqueIdentifier>{63c0eafa-6e89-4139-bd51-3f8facabc2d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scenes\collisionScene">
+      <UniqueIdentifier>{724cd5e8-313e-472b-9a4c-c937ac9f1260}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
