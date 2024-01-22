@@ -302,42 +302,56 @@ void GAME_SCENE::update(float deltaTime)
 	//	}
 	//}
 
-		if (c.CheckBoxCollision(GameObjects[0], GameObjects[2])) {
-			Body::Bounds ballBounds = GameObjects[0].getBounds();
-			Body::Bounds groundBounds = GameObjects[2].getBounds();
+		Body&dynamicBody=GameObjects[0]; //Dynamic body
+		Body&staticBody=GameObjects[2]; //Static body
+		float incidenceAngle=atan2f(dynamicBody.getPos().y-staticBody.getPos().y,dynamicBody.getPos().x-staticBody.getPos().x);
+		if (c.CheckBoxCollision(dynamicBody, staticBody)) {
+			Body::Bounds sBounds=staticBody.getBounds(); //Static body bounds.
+			Body::Bounds dBounds=dynamicBody.getBounds(); //Dynamic body bounds.
 
-			//max is the top (max is larger)
-			//min is the bottom (min is smaller)
-			float rightHandSideCollision = groundBounds.min.x - ballBounds.max.x;
-			float leftHandSideCollision = ballBounds.min.x - groundBounds.max.x;
-			float overlapX = max(rightHandSideCollision,leftHandSideCollision);
+			bool Bottom=false,Top=false,Left=false,Right=false;
 
-			if(overlapX<0)throw;
-
-			bool Bottom = ballBounds.min.y <= groundBounds.max.y && ballBounds.max.y >= groundBounds.min.y;
-			bool Top = ballBounds.max.y <= groundBounds.min.y && ballBounds.min.y >= groundBounds.max.y;
-			
+			if(fabs(incidenceAngle)<0.25f*PI){Right=true;}
+			else if(incidenceAngle<0.75f*PI&&incidenceAngle>0.25f*PI){Top=true;}
+			else if(incidenceAngle>-0.75f*PI&&incidenceAngle<-0.25f*PI){Bottom=true;}
+			else Left=true;
+			std::cout<<"Right:"<<std::boolalpha<<Right<<std::endl;
+			std::cout<<"Left:"<<std::boolalpha<<Left<<std::endl;
+			std::cout<<"Bottom:"<<std::boolalpha<<Bottom<<std::endl;
+			std::cout<<"Top:"<<std::boolalpha<<Top<<std::endl;
 
 			#pragma region Movement
 			if (Top) {
-				float overlapY=groundBounds.max.y - ballBounds.min.y;
+				float overlapY=sBounds.max.y - dBounds.min.y;
 				if(overlapY<0)throw;
 
-				GameObjects[0].pos.y += overlapY;
-				//GameObjects[0].vel.y = std::abs(GameObjects[0].vel.y);
+				dynamicBody.pos.y += overlapY;
+				dynamicBody.vel.y = std::abs(dynamicBody.vel.y);
 			}
 			else if (Bottom) {
-				float overlapY=ballBounds.max.y - groundBounds.min.y;
+				float overlapY=dBounds.max.y - sBounds.min.y;
 				if(overlapY<0)throw;
 
-				GameObjects[0].pos.y -= overlapY;
-				//GameObjects[0].vel.y = -std::abs(GameObjects[0].vel.y);
+				dynamicBody.pos.y -= overlapY;
+				dynamicBody.vel.y = -std::abs(dynamicBody.vel.y);
+			}
+
+			if(Left){
+				float overlapX=dBounds.min.x - sBounds.max.x;
+				if(overlapX<0)throw;
+
+				dynamicBody.pos.x -= overlapX;
+				dynamicBody.vel.x = -std::abs(dynamicBody.vel.x);
+			}else if(Right){
+				float overlapX=sBounds.min.x - dBounds.max.x;
+				if(overlapX<0)throw;
+
+				dynamicBody.pos.x += overlapX;
+				dynamicBody.vel.x = std::abs(dynamicBody.vel.x);
 			}
 			#pragma endregion
-
 			
-			c.setCollisionMask(GameObjects[0]);
-			//GameObjects[0].vel.x = -std::abs(GameObjects[0].vel.x);
+			c.setCollisionMask(dynamicBody);
 		}
 
 	}
