@@ -11,7 +11,7 @@
 //------------------------------------------------------------------------
 #include "app\app.h"
 //------------------------------------------------------------------------
-
+#include <array>
 
 CSimpleSprite* game_background;
 CSimpleSprite* playerSprite;
@@ -213,12 +213,10 @@ void GAME_SCENE::update(float deltaTime)
 	////player.Update(deltaTime);
 	////ground.Update(deltaTime);
 
-	if(App::IsKeyPressed('P')){
-		for (Body& b : GameObjects) {
-			if (b.isActive) {
-				b.Update(deltaTime);
-				c.setCollisionMask(b);
-			}
+	for (Body& b : GameObjects) {
+		if (b.isActive) {
+			b.Update(deltaTime);
+			c.setCollisionMask(b);
 		}
 	}
 
@@ -301,24 +299,91 @@ void GAME_SCENE::update(float deltaTime)
 	//				//}
 	//	}
 	//}
+		
+		auto degToRad=[](float deg){
+			return deg*(PI/180);
+		};
+
+		auto radToDeg=[](float rad){
+			return rad*57.2957795130823208767f;
+		};
+
+		auto lineIntersection=[](const Vec2&l1p1,const Vec2&l1p2,const Vec2&l2p1,const Vec2&l2p2)->const Vec2{
+			Vec2 vec=l1p2-l1p1;
+			Vec2 vec2=l2p2-l2p1;
+			float crossP=vec.x*vec2.y-vec.y*vec2.x;
+
+			float rd = crossP;
+			if (rd == 0) return Vec2{}; // Parallel or Colinear TODO: Return two points
+
+			//Inverse rd product
+			rd = 1.f / rd;
+
+			//Cross products: 
+			//rn = (b1b2 x b1a1)
+			float rn = ((l2p2.x - l2p1.x) * (l1p1.y - l2p1.y) - (l2p2.y - l2p1.y) * (l1p1.x - l2p1.x)) * rd;
+			//sn = (a1a2 x b1a1)
+			float sn = ((l1p2.x - l1p1.x) * (l1p1.y - l2p1.y) - (l1p2.y - l1p1.y) * (l1p1.x - l2p1.x)) * rd;
+
+			//Return the intersection depth
+			//if (d) *d = rn;
+
+			if (rn < 0.f || rn > 1.f || sn < 0.f || sn > 1.f)
+				return Vec2{}; // Intersection not within line segment
+
+			return Vec2{l1p1.x+rn*vec.x,l1p1.y+rn*vec.y};
+		};
 
 		Body&dynamicBody=GameObjects[0]; //Dynamic body
 		Body&staticBody=GameObjects[2]; //Static body
-		float incidenceAngle=atan2f(dynamicBody.getPos().y-staticBody.getPos().y,dynamicBody.getPos().x-staticBody.getPos().x);
 		if (c.CheckBoxCollision(dynamicBody, staticBody)) {
 			Body::Bounds sBounds=staticBody.getBounds(); //Static body bounds.
 			Body::Bounds dBounds=dynamicBody.getBounds(); //Dynamic body bounds.
 
 			bool Bottom=false,Top=false,Left=false,Right=false;
 
-			if(fabs(incidenceAngle)<0.25f*PI){Right=true;}
-			else if(incidenceAngle<0.75f*PI&&incidenceAngle>0.25f*PI){Top=true;}
-			else if(incidenceAngle>-0.75f*PI&&incidenceAngle<-0.25f*PI){Bottom=true;}
+			float TLcornerAngle=sinf(((sBounds.min.x-sBounds.max.x)/2.f)/((Vec2{sBounds.max.x,sBounds.max.y}).getMag())); //We use this angle to determine the grade on which the top side versus the sides intersect.
+
+			std::array<Vec2,8>dRectLines={
+				Vec2{dBounds.max.x,dBounds.max.y}, //Top Line
+				Vec2{dBounds.min.x,dBounds.max.y},
+				Vec2{dBounds.min.x,dBounds.max.y}, //Right Line
+				Vec2{dBounds.min.x,dBounds.min.y},
+				Vec2{dBounds.max.x,dBounds.min.y}, //Bottom Line
+				Vec2{dBounds.min.x,dBounds.min.y},
+				Vec2{dBounds.max.x,dBounds.max.y}, //Left Line
+				Vec2{dBounds.max.x,dBounds.min.y},
+			};
+			std::array<Vec2,8>sRectLines={
+				Vec2{sBounds.max.x,sBounds.max.y}, //Top Line
+				Vec2{sBounds.min.x,sBounds.max.y},
+				Vec2{sBounds.min.x,sBounds.max.y}, //Right Line
+				Vec2{sBounds.min.x,sBounds.min.y},
+				Vec2{sBounds.max.x,sBounds.min.y}, //Bottom Line
+				Vec2{sBounds.min.x,sBounds.min.y},
+				Vec2{sBounds.max.x,sBounds.max.y}, //Left Line
+				Vec2{sBounds.max.x,sBounds.min.y},
+			};
+
+			std::vector<Vec2>intersections;
+			for(size_t i=0;i<dRectLines.size();i+=2){
+				for(size_t j=0;j<sRectLines.size();j+=2){
+					Vec2 intersection=lineIntersection(dRectLines[i],dRectLines[i+1],sRectLines[j],sRectLines[j+1]);
+					if(intersection.x!=0.f&&intersection.y!=0.f)intersections.push_back(intersection);
+				}
+			}
+
+			if(intersections.size()<2)throw;
+			Vec2&pt1=intersections[0];
+			Vec2&pt2=intersections[1];
+			Vec2 midpoint={(pt1.x+pt2.x)/2.f,(pt1.y+pt2.y)/2.f};
+		
+			float incidenceAngle=atan2f(midpoint.y-staticBody.getPos().y,midpoint.x-staticBody.getPos().x);
+
+			if(fabs(incidenceAngle)<TLcornerAngle){Right=true;}
+			else if(incidenceAngle<PI-TLcornerAngle&&incidenceAngle>TLcornerAngle){Top=true;}
+			else if(incidenceAngle>-PI+TLcornerAngle&&incidenceAngle<-TLcornerAngle){Bottom=true;}
 			else Left=true;
-			std::cout<<"Right:"<<std::boolalpha<<Right<<std::endl;
-			std::cout<<"Left:"<<std::boolalpha<<Left<<std::endl;
-			std::cout<<"Bottom:"<<std::boolalpha<<Bottom<<std::endl;
-			std::cout<<"Top:"<<std::boolalpha<<Top<<std::endl;
 
 			#pragma region Movement
 			if (Top) {
