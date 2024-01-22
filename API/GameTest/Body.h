@@ -5,6 +5,7 @@
 #pragma once
 #include "stdafx.h"
 #include "app\app.h"
+#include "CollisionType.h"
 
 using namespace ZOE;
 
@@ -15,10 +16,15 @@ public:
 #pragma region defaults
 	// Vectors set to [0,0,0] by their default constructor
 	Vec2 pos; 
+	Vec2 prevPos;
 	Vec2 vel;
 	Vec2 acc;
 
+	CollisionMaskType collisionMaskType=BOUNDING_BOX;
+
 	CSimpleSprite m_sprite;
+
+
 
 	SimpleCamera2D cam;
 
@@ -36,8 +42,8 @@ public:
 	bool isActive;
 
 	struct Bounds {
-		Vec3 min;
 		Vec3 max;
+		Vec3 min;
 	};
 
 	// Default Constructor //

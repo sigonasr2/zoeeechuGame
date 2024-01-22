@@ -117,6 +117,9 @@
     <ClInclude Include="SimpleCamera2D.h">
       <Filter>zoe\Math</Filter>
     </ClInclude>
+    <ClInclude Include="CollisionType.h">
+      <Filter>zoe</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="NextAPI">

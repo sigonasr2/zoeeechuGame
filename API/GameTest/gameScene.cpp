@@ -67,8 +67,8 @@ enum CollisionSide {
 };
 
 struct Bounds {
-	Vec3 min;
 	Vec3 max;
+	Vec3 min;
 };
 
 
@@ -103,6 +103,11 @@ void GAME_SCENE::init()
 	groundSprite = App::CreateSprite(".\\TestData\\red-brick-wall.png", 1, 1);
 	ground = Body(Vec2(500.0f, 800.0f), Vec2(0.0f, 0.0f), Vec2(0.0, 0.0), 200.0f, 0.0f, *groundSprite, 0.10f, true, GameScene_camera);
 	GameObjects.push_back(ground);
+
+	for(Body&b:GameObjects){
+		c.setCollisionMask(b);
+	}
+
 	//
 	//playerSprite = App::CreateSprite(".\\TestData\\blob.png", 1, 1);
 	//player = Body(Vec2(400.0f, 200.0f), Vec2(10.0f, 10.0f), Vec2(0.0, 0.0), 200.0f, 9.8f, *playerSprite, 0.20f, true, GameScene_camera);
@@ -126,33 +131,33 @@ void checkScreenCollision(Body& object)
 
 
 	// Check for collisions with the left and right screen boundaries
-	if (bounds.min.x < 0.0f)
+	if (bounds.max.x < 0.0f)
 	{
 		// Adjust the position to prevent going beyond the left boundary
-		object.pos.x -= bounds.min.x;
+		object.pos.x -= bounds.max.x;
 		// Reflect the velocity of the object horizontally
 		object.vel.x = std::abs(object.vel.x);
 	}
-	else if (bounds.max.x > APP_VIRTUAL_WIDTH)
+	else if (bounds.min.x > APP_VIRTUAL_WIDTH)
 	{
 		// Adjust the position to prevent going beyond the right boundary
-		object.pos.x -= (bounds.max.x - APP_VIRTUAL_WIDTH);
+		object.pos.x -= (bounds.min.x - APP_VIRTUAL_WIDTH);
 		// Reflect the velocity of the object horizontally
 		object.vel.x = -std::abs(object.vel.x);
 	}
 
 	// Check for collisions with the top and bottom screen boundaries
-	if (bounds.min.y < topLimit)
+	if (bounds.max.y < topLimit)
 	{
 		// Adjust the position to prevent going beyond the top boundary
-		object.pos.y -= bounds.min.y;
+		object.pos.y -= bounds.max.y;
 		// Reflect the velocity of the object vertically
 		object.vel.y = std::abs(object.vel.y);
 	}
-	else if (bounds.max.y > bottomLimit)
+	else if (bounds.min.y > bottomLimit)
 	{
 		// Adjust the position to prevent going beyond the bottom boundary
-		object.pos.y -= (bounds.max.y - bottomLimit);
+		object.pos.y -= (bounds.min.y - bottomLimit);
 		// Reflect the velocity of the object vertically
 		object.vel.y = -std::abs(object.vel.y);
 	}
@@ -170,9 +175,9 @@ CollisionSide getCollisionSide(const Body& ball, const Body& ground) {
 	Body::Bounds ballBounds = ball.getBounds();
 	Body::Bounds groundBounds = ground.getBounds();
 
-	if (ballBounds.max.x > groundBounds.max.x && ballBounds.min.x < groundBounds.min.x) {
+	if (ballBounds.min.x > groundBounds.min.x && ballBounds.max.x < groundBounds.max.x) {
 		// Ball is within the x range of the ground
-		if (ballBounds.min.y < groundBounds.min.y) {
+		if (ballBounds.max.y < groundBounds.max.y) {
 			// Ball is above the ground
 			return CollisionSide::Top;
 		}
@@ -181,9 +186,9 @@ CollisionSide getCollisionSide(const Body& ball, const Body& ground) {
 			return CollisionSide::Bottom;
 		}
 	}
-	else if (ballBounds.max.y > groundBounds.max.y && ballBounds.min.y < groundBounds.min.y) {
+	else if (ballBounds.min.y > groundBounds.min.y && ballBounds.max.y < groundBounds.max.y) {
 		// Ball is within the y range of the ground
-		if (ballBounds.min.x < groundBounds.min.x) {
+		if (ballBounds.max.x < groundBounds.max.x) {
 			// Ball is to the left of the ground
 			return CollisionSide::Left;
 		}
@@ -208,9 +213,12 @@ void GAME_SCENE::update(float deltaTime)
 	////player.Update(deltaTime);
 	////ground.Update(deltaTime);
 
-	for (Body& b : GameObjects) {
-		if (b.isActive) {
-			b.Update(deltaTime);
+	if(App::IsKeyPressed('P')){
+		for (Body& b : GameObjects) {
+			if (b.isActive) {
+				b.Update(deltaTime);
+				c.setCollisionMask(b);
+			}
 		}
 	}
 
@@ -250,23 +258,23 @@ void GAME_SCENE::update(float deltaTime)
 	//	if (c.CheckBoxCollision(GameObjects[0], GameObjects[2])) {
 	//
 	//		/*
-	//		object.pos.y -= bounds.min.y;
+	//		object.pos.y -= bounds.max.y;
 	//		//
 	//		object.vel.y = std::abs(object.vel.y);*/
-	//		//Body::Bounds groundBounds = ground.getBounds();
-	//		//GameObjects[0].pos.x -= groundBounds.min.x;
-	//		//GameObjects[0].pos.y -= groundBounds.min.y;
+	//		//Body::Bounds groundBounds = ground.setBodyBounds();
+	//		//GameObjects[0].pos.x -= groundBounds.max.x;
+	//		//GameObjects[0].pos.y -= groundBounds.max.y;
 	//		//GameObjects[0].vel.x = std::abs(GameObjects[0].vel.x);
 	//		//GameObjects[0].vel.y = std::abs(GameObjects[0].vel.y);
-	//		Body::Bounds ballBounds = ball.getBounds();
-	//		Body::Bounds groundBounds = ground.getBounds();
+	//		Body::Bounds ballBounds = ball.setBodyBounds();
+	//		Body::Bounds groundBounds = ground.setBodyBounds();
 	//
 	//		// Calculate the overlap (how much the ball has penetrated into the block)
-	//		float overlapX = ballBounds.max.x - groundBounds.min.x;
-	//		float overlapY = ballBounds.max.y - groundBounds.min.y;
+	//		float overlapX = ballBounds.min.x - groundBounds.max.x;
+	//		float overlapY = ballBounds.min.y - groundBounds.max.y;
 	//
-	//		bool Top = ballBounds.max.y <= groundBounds.min.y && ballBounds.min.y >= groundBounds.max.y;
-	//		bool Bottom = ballBounds.min.y >= groundBounds.max.y && ballBounds.max.y <= groundBounds.min.y;
+	//		bool Top = ballBounds.min.y <= groundBounds.max.y && ballBounds.max.y >= groundBounds.min.y;
+	//		bool Bottom = ballBounds.max.y >= groundBounds.min.y && ballBounds.min.y <= groundBounds.max.y;
 	//
 	//		// Ensure the overlap is positive
 	//		overlapX = overlapX < 0 ? -overlapX : 0;
@@ -295,33 +303,41 @@ void GAME_SCENE::update(float deltaTime)
 	//}
 
 		if (c.CheckBoxCollision(GameObjects[0], GameObjects[2])) {
-			Body::Bounds ballBounds = ball.getBounds();
-			Body::Bounds groundBounds = ground.getBounds();
+			Body::Bounds ballBounds = GameObjects[0].getBounds();
+			Body::Bounds groundBounds = GameObjects[2].getBounds();
 
-			
-			float overlapX = min(ballBounds.max.x - groundBounds.min.x, groundBounds.max.x - ballBounds.min.x);
-			float overlapY = min(ballBounds.max.y - groundBounds.min.y, groundBounds.max.y - ballBounds.min.y);
+			//max is the top (max is larger)
+			//min is the bottom (min is smaller)
+			float rightHandSideCollision = groundBounds.min.x - ballBounds.max.x;
+			float leftHandSideCollision = ballBounds.min.x - groundBounds.max.x;
+			float overlapX = max(rightHandSideCollision,leftHandSideCollision);
 
-			
-			overlapX = overlapX < 0 ? 0 : overlapX;
-			overlapY = overlapY < 0 ? 0 : overlapY;
+			if(overlapX<0)throw;
 
-			bool Top = ballBounds.max.y <= groundBounds.min.y && ballBounds.min.y >= groundBounds.max.y;
 			bool Bottom = ballBounds.min.y <= groundBounds.max.y && ballBounds.max.y >= groundBounds.min.y;
-
+			bool Top = ballBounds.max.y <= groundBounds.min.y && ballBounds.min.y >= groundBounds.max.y;
 			
+
+			#pragma region Movement
 			if (Top) {
-				GameObjects[0].pos.y -= overlapY;
-				GameObjects[0].vel.y = std::abs(GameObjects[0].vel.y);
+				float overlapY=groundBounds.max.y - ballBounds.min.y;
+				if(overlapY<0)throw;
+
+				GameObjects[0].pos.y += overlapY;
+				//GameObjects[0].vel.y = std::abs(GameObjects[0].vel.y);
 			}
 			else if (Bottom) {
-				GameObjects[0].pos.y += overlapY;
-				GameObjects[0].vel.y = -std::abs(GameObjects[0].vel.y);
+				float overlapY=ballBounds.max.y - groundBounds.min.y;
+				if(overlapY<0)throw;
+
+				GameObjects[0].pos.y -= overlapY;
+				//GameObjects[0].vel.y = -std::abs(GameObjects[0].vel.y);
 			}
+			#pragma endregion
 
 			
-			GameObjects[0].pos.x += overlapX;
-			GameObjects[0].vel.x = -std::abs(GameObjects[0].vel.x);
+			c.setCollisionMask(GameObjects[0]);
+			//GameObjects[0].vel.x = -std::abs(GameObjects[0].vel.x);
 		}
 
 	}
@@ -329,7 +345,7 @@ void GAME_SCENE::update(float deltaTime)
 	for (int i = 0; i < GameObjects.size(); i++) {
 
 		App::GetMousePos(MousePos_Game.x, MousePos_Game.y);
-		c.getBounds(GameObjects[1]);
+		c.setBodyBounds(GameObjects[1]);
 
 		mouseDown_game = (IsButtonDown(VK_LBUTTON));
 
@@ -337,8 +353,8 @@ void GAME_SCENE::update(float deltaTime)
 		//some of the grossest code I wrote, When trying to optimize however it would break?
 		if (mouseDown_game) {
 		
-			if (ballIntersect = inGivenBounds(Vec2(GameObjects[0].getBounds().min.x, GameObjects[0].getBounds().min.y),
-				Vec2(GameObjects[0].getBounds().max.x, GameObjects[0].getBounds().max.y),
+			if (ballIntersect = inGivenBounds(Vec2(GameObjects[0].getBounds().max.x, GameObjects[0].getBounds().max.y),
+				Vec2(GameObjects[0].getBounds().min.x, GameObjects[0].getBounds().min.y),
 				MousePos_Game)) {
 
 				drag = true; 
@@ -387,8 +403,8 @@ void GAME_SCENE::update(float deltaTime)
 		//		GameObjects[j].acc = Vec2(0.0f, 0.0f);
 		//		
 		//
-		//		//Vec3 pt1 = Vec3(GameObjects[j].getBounds().min.x, GameObjects[j].getBounds().max.y, 0.0f);
-		//		//Vec3 pt2 = Vec3(GameObjects[j].getBounds().min.x, GameObjects[j].getBounds().min.y, 0.0f);
+		//		//Vec3 pt1 = Vec3(GameObjects[j].setBodyBounds().max.x, GameObjects[j].setBodyBounds().min.y, 0.0f);
+		//		//Vec3 pt2 = Vec3(GameObjects[j].setBodyBounds().max.x, GameObjects[j].setBodyBounds().max.y, 0.0f);
 		//		//float height = pt1.y - pt2.y;
 		//		//GameObjects[j].pos.y = GameObjects[i].pos.y - height;
 		//		//GameObjects[j].m_sprite.SetPosition(GameObjects[j].pos.x, GameObjects[i].pos.y - height);
@@ -477,9 +493,21 @@ void GAME_SCENE::render(int WINDOW_W, int WINDOW_H)
 			shape.simpleLine({ 1,0,0 }, Vec3(GameObjects[0].pos.x, GameObjects[0].pos.y, 0), Vec3(MousePos_Game.x, MousePos_Game.y, 0));
 		}
 
-	
-		c.setCollisionMask(GameObjects[0], simpleCollision::CIRCLE);
-		c.setCollisionMask(GameObjects[2], simpleCollision::BOUNDING_BOX);
+		switch (GameObjects[i].collisionMaskType) {
+			case BOUNDING_BOX:
+				// Draw bounding box
+				c.drawCollisionQuadMask(GameObjects[i]);
+				break;
+			case CIRCLE:
+				// Draw circle
+				c.drawCollisionCircleMask(GameObjects[i]);
+				break;
+				// Add more cases for additional types
+			default:
+				// Handle unknown type or provide a default behavior
+				break;
+		}
+		
 	}
 
 	//for (Body& b : GameObjects) {

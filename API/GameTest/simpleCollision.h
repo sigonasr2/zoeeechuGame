@@ -9,17 +9,10 @@ using namespace ZOE;
 class simpleCollision {
 
 public:
-
-	enum CollisionMaskType {
-		BOUNDING_BOX,
-		CIRCLE,
-	};
-
-
-	void getBounds(Body& bdy);
+	void setBodyBounds(Body& bdy);
 	void drawCollisionQuadMask(Body& bdy);
 	void drawCollisionCircleMask(Body& bdy);
-	void setCollisionMask(Body& bdy, CollisionMaskType maskType);
+	void setCollisionMask(Body& bdy);
 	bool CheckBoxCollision(const Body& a, const Body& b,char* result = nullptr);
 	bool CheckCircleCollision(const Body& a, const Body& b, char* result = nullptr);
 	bool CheckCircleToBoxCollision(const Body& circle, const Body& box, char* result = nullptr);

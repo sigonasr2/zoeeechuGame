@@ -39,6 +39,7 @@ void Body::Update(float deltaTime) {
 
 	float dt = deltaTime / 1000.0f;
 
+	prevPos=pos;
 	pos.y += vel.y * dt + 0.5f * acc.y * powf(dt, 2);
 	pos.x += vel.x * dt + 0.5f * acc.x * powf(dt, 2);
 	vel.y += acc.y * dt ;
