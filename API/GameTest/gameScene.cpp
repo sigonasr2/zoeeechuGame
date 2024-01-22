@@ -126,7 +126,7 @@ void checkScreenCollision(Body& object)
 
 
 	// Calculate dynamic top and bottom limits based on a proportion of the window height
-	float topLimit = 0.06f * APP_VIRTUAL_HEIGHT;  // Adjust as needed (e.g., 10% of the window height)
+	float topLimit = 0.05f * APP_VIRTUAL_HEIGHT;  // Adjust as needed (e.g., 10% of the window height)
 	float bottomLimit = 0.95f * APP_VIRTUAL_HEIGHT;  // Adjust as needed (e.g., 90% of the window height)
 
 
@@ -147,17 +147,17 @@ void checkScreenCollision(Body& object)
 	}
 
 	// Check for collisions with the top and bottom screen boundaries
-	if (bounds.max.y < topLimit)
+	if (bounds.min.y < topLimit)
 	{
 		// Adjust the position to prevent going beyond the top boundary
-		object.pos.y -= bounds.max.y;
+		object.pos.y -= (bounds.min.y - topLimit);
 		// Reflect the velocity of the object vertically
 		object.vel.y = std::abs(object.vel.y);
 	}
-	else if (bounds.min.y > bottomLimit)
+	else if (bounds.max.y > bottomLimit)
 	{
 		// Adjust the position to prevent going beyond the bottom boundary
-		object.pos.y -= (bounds.min.y - bottomLimit);
+		object.pos.y -= (bounds.max.y - bottomLimit);
 		// Reflect the velocity of the object vertically
 		object.vel.y = -std::abs(object.vel.y);
 	}
@@ -299,14 +299,6 @@ void GAME_SCENE::update(float deltaTime)
 	//				//}
 	//	}
 	//}
-		
-		auto degToRad=[](float deg){
-			return deg*(PI/180);
-		};
-
-		auto radToDeg=[](float rad){
-			return rad*57.2957795130823208767f;
-		};
 
 		auto lineIntersection=[](const Vec2&l1p1,const Vec2&l1p2,const Vec2&l2p1,const Vec2&l2p2)->const Vec2{
 			Vec2 vec=l1p2-l1p1;
